@@ -78,10 +78,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.flurry.android.FlurryAgent;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 import com.ksmaze.android.preference.ListPreferenceMultiSelect;
@@ -142,7 +138,6 @@ public class ProxyDroid extends SherlockPreferenceActivity
   private CheckBoxPreference isBypassAppsCheck;
   private Preference proxyedApps;
   private Preference bypassAddrs;
-  private AdView adView;
   private BroadcastReceiver ssidReceiver = new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -287,17 +282,6 @@ public class ProxyDroid extends SherlockPreferenceActivity
     excludedSsidList.setEntryValues(pureSsid);
   }
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    FlurryAgent.onStartSession(this, "AV372I7R5YYD52NWPUPE");
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    FlurryAgent.onEndSession(this);
-  }
 
   private LinearLayout getLayout(ViewParent parent) {
     if (parent instanceof LinearLayout) return (LinearLayout) parent;
@@ -314,21 +298,11 @@ public class ProxyDroid extends SherlockPreferenceActivity
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.proxydroid_preference);
 
-    // Create the adView
-    adView = new AdView(this);
-    adView.setAdUnitId("ca-app-pub-9097031975646651/4806879927");
-    adView.setAdSize(AdSize.SMART_BANNER);
     // Lookup your LinearLayout assuming it’s been given
     // the attribute android:id="@+id/mainLayout"
     ViewParent parent = getListView().getParent();
     LinearLayout layout = getLayout(parent);
 
-    // disable adds
-    if (layout != null) {
-      // Add the adView to it
-      layout.addView(adView, 0);
-      adView.loadAd(new AdRequest.Builder().build());
-    }
 
     hostText = (EditTextPreference) findPreference("host");
     portText = (EditTextPreference) findPreference("port");
@@ -421,8 +395,6 @@ public class ProxyDroid extends SherlockPreferenceActivity
   /** Called when the activity is closed. */
   @Override
   public void onDestroy() {
-
-    if (adView != null) adView.destroy();
 
     if (ssidReceiver != null) unregisterReceiver(ssidReceiver);
 
